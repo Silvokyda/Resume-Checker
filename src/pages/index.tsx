@@ -1,4 +1,3 @@
-import Link from "next/link";
 import { useRouter } from "next/router";
 import {
   ChangeEvent,
@@ -100,15 +99,6 @@ export default function Home() {
             <h1 className="text-3xl lg:text-5xl font-bold mb-4">
               Upload your CV and get immediate feedback
             </h1>
-            <p className="text-black/80 dark:text-white/80">
-              Resume checker is trained by recruiters and engineers from{" "}
-              <Link
-                href="https://silver.dev/"
-                className="text-indigo-400 hover:text-indigo-300"
-              >
-                Silver.dev
-              </Link>
-            </p>
           </div>
 
           <form

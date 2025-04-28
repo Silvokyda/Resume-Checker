@@ -83,7 +83,7 @@ export default async function handler(
 
 
 export const config = {
-  maxDuration: 300,
+  maxDuration: 60,
 };
 
 export const api = {

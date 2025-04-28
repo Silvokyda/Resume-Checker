@@ -33,7 +33,7 @@ export default function Privacy() {
           <p className="font-bold mb-2">Data security</p>
           <p>
             We ensure your data is processed in a secure environment. Since we
-            don't store information, there is no risk of unauthorized access or
+            don&apos;t store information, there is no risk of unauthorized access or
             misuse of your data.
           </p>
         </li>

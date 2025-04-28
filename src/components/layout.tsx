@@ -3,7 +3,6 @@ import { Lato } from "next/font/google";
 import Link from "next/link";
 import Head from "next/head";
 import { type ReactNode } from "react";
-import { TYPST_TEMPLATE_URL } from "@/utils";
 const lato = Lato({ subsets: ["latin"], weight: "400" });
 
 export default function Layout({ children }: { children: ReactNode }) {

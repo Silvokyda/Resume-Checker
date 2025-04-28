@@ -24,7 +24,7 @@ export default async function handler(
 ) {
   try {
     if (!["POST", "GET"].includes(req.method || "")) {
-      res.status(404).send({ error: "Not Found" });
+      res.status(404).json({ error: "Not Found" });
       return;
     }
 
@@ -77,7 +77,7 @@ export default async function handler(
     console.error(err);
     res
       .status(500)
-      .send({ error: err instanceof Error ? err.message : "Unexpected error" });
+      .json({ error: err instanceof Error ? err.message : "Unexpected error" });
   }
 }
 

@@ -4,12 +4,20 @@ import { google } from "@ai-sdk/google";
 import fs from "node:fs";
 import path from "node:path";
 import pdf from "pdf-parse";
+import formidable from "formidable"; // 🚨 important
 import {
   messages,
   ResponseData,
   ResponseSchema,
   sanitizeCompletion,
 } from "@/prompts/grade";
+
+export const config = {
+  api: {
+    bodyParser: false, // 🚨 important
+  },
+  maxDuration: 60,
+};
 
 function isMultipartFormData(req: NextApiRequest) {
   return (
@@ -20,7 +28,7 @@ function isMultipartFormData(req: NextApiRequest) {
 
 export default async function handler(
   req: NextApiRequest,
-  res: NextApiResponse<ResponseData | { error: string }>
+  res: NextApiResponse<ResponseData | { error: string }>,
 ) {
   try {
     if (!["POST", "GET"].includes(req.method || "")) {
@@ -29,12 +37,20 @@ export default async function handler(
     }
 
     let pdfBuffer: Buffer;
+
     if (isMultipartFormData(req)) {
-      const chunks = [];
-      for await (const chunk of req) {
-        chunks.push(chunk);
+      const form = formidable({ multiples: false });
+
+      // 🔥 Parse form data properly
+      const [, files] = await form.parse(req);
+
+      const file = Array.isArray(files.resume) ? files.resume[0] : files.resume;
+      if (!file || typeof file === 'string') {
+        throw new Error("No resume file uploaded");
       }
-      pdfBuffer = Buffer.concat(chunks);
+
+      // Read the uploaded file
+      pdfBuffer = await fs.promises.readFile(file.filepath);
     } else {
       const { url } = req.query;
       if (!url || typeof url !== "string") {
@@ -80,12 +96,3 @@ export default async function handler(
       .send({ error: err instanceof Error ? err.message : "Unexpected error" });
   }
 }
-
-
-export const config = {
-  maxDuration: 60,
-};
-
-export const api = {
-  bodyParser: false,
-};

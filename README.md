@@ -1,6 +1,5 @@
-# Silver.dev's Resume Checker
-
-Resume Checker is a web-based application that uses AI to analyze resumes, provide feedback, and grade them following [silver.dev](https://silver.dev)'s [CV Checklist](https://docs.silver.dev/interview-ready/soft-fundamentals/preparando-el-cv#cv-checklist). With a simple and user-friendly interface, users can upload their resumes and receive actionable suggestions for improvement, helping them enhance their chances in the job market.
+# Resume Checker
+Uses AI to analyze resumes, provide feedback, and grade them. With a simple and user-friendly interface, users can upload their resumes and receive actionable suggestions for improvement, helping them enhance their chances in the job market.
 
 ## Features
 
@@ -32,7 +31,7 @@ Ensure you have the following installed:
 1. Clone the repository:
 
   ```bash
-  git clone https://github.com/conanbatt/resume-checker.git
+  git clone https://github.com/silvokyda/resume-checker.git
   cd resume-checker
   ```
 
@@ -60,7 +59,3 @@ Ensure you have the following installed:
 1. Wait for the analysis to complete.
 1. Review the grade and suggestions provided by the AI.
 
-## Contributions
-
-Contributions are welcome! Feel free to fork the repository and submit a pull request with your improvements.
-For more on [how to contribute](https://opensource.guide/how-to-contribute/)

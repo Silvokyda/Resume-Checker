@@ -20,7 +20,7 @@ function isMultipartFormData(req: NextApiRequest) {
 
 export default async function handler(
   req: NextApiRequest,
-  res: NextApiResponse<ResponseData | { error: string }>,
+  res: NextApiResponse<ResponseData | { error: string }>
 ) {
   try {
     if (!["POST", "GET"].includes(req.method || "")) {
@@ -43,15 +43,14 @@ export default async function handler(
 
       if (url.startsWith("public")) {
         pdfBuffer = fs.readFileSync(path.join(process.cwd(), url));
-        /* Set cache for a week only on the template resumes */
         res.setHeader("Content-Location", url);
         res.setHeader(
           "Cache-Control",
-          "public, max-age=604800, stale-while-revalidate=604800",
+          "public, max-age=604800, stale-while-revalidate=604800"
         );
       } else {
         pdfBuffer = Buffer.from(
-          await fetch(url).then((response) => response.arrayBuffer()),
+          await fetch(url).then((response) => response.arrayBuffer())
         );
       }
     }
@@ -67,7 +66,7 @@ export default async function handler(
 
     if (!completion) {
       throw new Error(
-        "Could not complete the call to the artificial intelligence",
+        "Could not complete the call to the artificial intelligence"
       );
     }
 
@@ -82,9 +81,11 @@ export default async function handler(
   }
 }
 
+
 export const config = {
   maxDuration: 300,
-  api: {
-    bodyParser: false,
-  },
+};
+
+export const api = {
+  bodyParser: false,
 };

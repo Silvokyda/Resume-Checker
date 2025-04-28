@@ -1,69 +1,91 @@
 import type { NextApiRequest, NextApiResponse } from "next";
-import { Resend } from "resend";
+import { generateObject } from "ai";
+import { google } from "@ai-sdk/google";
 import fs from "node:fs";
-import formidable from "formidable";
-import FeedbackEmail from "@/components/feedback-email";
+import path from "node:path";
+import pdf from "pdf-parse";
+import {
+  messages,
+  ResponseData,
+  ResponseSchema,
+  sanitizeCompletion,
+} from "@/prompts/grade";
 
-const resend = new Resend(process.env.RESEND_KEY);
+function isMultipartFormData(req: NextApiRequest) {
+  return (
+    req.method === "POST" &&
+    req.headers["content-type"]?.includes("multipart/form-data")
+  );
+}
 
 export default async function handler(
   req: NextApiRequest,
-  res: NextApiResponse,
+  res: NextApiResponse<ResponseData | { error: string }>
 ) {
   try {
-    if (req.method !== "POST") {
-      res.status(404).send({ message: "Not Found" });
+    if (!["POST", "GET"].includes(req.method || "")) {
+      res.status(404).send({ error: "Not Found" });
       return;
     }
 
-    const form = formidable({});
-    const [fields, files] = await form.parse(req);
+    let pdfBuffer: Buffer;
+    if (isMultipartFormData(req)) {
+      const chunks = [];
+      for await (const chunk of req) {
+        chunks.push(chunk);
+      }
+      pdfBuffer = Buffer.concat(chunks);
+    } else {
+      const { url } = req.query;
+      if (!url || typeof url !== "string") {
+        throw new Error("You must provide a PDF file or URL");
+      }
 
-    const red_flags = fields.red_flags?.[0]
-      ? JSON.parse(fields.red_flags[0])
-      : [];
-    const yellow_flags = fields.yellow_flags?.[0]
-      ? JSON.parse(fields.yellow_flags[0])
-      : [];
-    const grade = fields.grade?.[0] ? fields.grade[0] : "";
-    const url = fields.url?.[0] ? fields.url[0] : "";
-    const description = fields.description?.[0] ? fields.description[0] : "";
-    const resume = files.resume?.[0] ? files.resume[0] : undefined;
-
-    let attachment;
-    if (resume) {
-      attachment = {
-        content: fs.readFileSync(resume.filepath).toString("base64"),
-        filename: "resume.pdf",
-      };
-    } else if (url && url.startsWith("http")) {
-      attachment = { path: url, filename: "resume.pdf" };
+      if (url.startsWith("public")) {
+        pdfBuffer = fs.readFileSync(path.join(process.cwd(), url));
+        res.setHeader("Content-Location", url);
+        res.setHeader(
+          "Cache-Control",
+          "public, max-age=604800, stale-while-revalidate=604800"
+        );
+      } else {
+        pdfBuffer = Buffer.from(
+          await fetch(url).then((response) => response.arrayBuffer())
+        );
+      }
     }
 
-    const { error } = await resend.emails.send({
-      from: "Resume Checker <silvansowino1@sgmail.com>",
-      to: ["arnishahwalter@gmail.com"],
-      subject: "Resume Checker Feedback",
-      react: FeedbackEmail({ yellow_flags, red_flags, grade, description }),
-      attachments: attachment ? [attachment] : undefined,
+    const parsed = await pdf(pdfBuffer);
+
+    const completion = await generateObject({
+      model: google("gemini-1.5-pro"),
+      temperature: 0,
+      messages: messages(parsed, pdfBuffer),
+      schema: ResponseSchema,
     });
 
-    if (error) {
-      throw new Error(error.message);
+    if (!completion) {
+      throw new Error(
+        "Could not complete the call to the artificial intelligence"
+      );
     }
 
-    res.status(200).send({ success: true });
+    const sanitized = sanitizeCompletion(completion);
+
+    res.status(200).json(sanitized);
   } catch (err) {
     console.error(err);
-    res.status(500).send({
-      message: "We encountered an unexpected error sending your email. Please try again.",
-    });
+    res
+      .status(500)
+      .send({ error: err instanceof Error ? err.message : "Unexpected error" });
   }
 }
 
+
 export const config = {
-  maxDuration: 30,
-  api: {
-    bodyParser: false,
-  },
+  maxDuration: 300,
+};
+
+export const api = {
+  bodyParser: false,
 };

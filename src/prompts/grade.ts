@@ -11,12 +11,20 @@ export const ResponseSchema = z.object({
   grade: z.enum(["S", "A", "B", "C"]),
   red_flags: z.array(z.string()),
   yellow_flags: z.array(z.string()),
+  key_skills: z.array(z.string()).min(3).max(10),
+  suitable_job_areas: z.array(z.string()).length(3),
+  skills_gaps: z.array(z.string()).length(3),
+  next_steps: z.array(z.string()).length(3),
 });
 
 const sResponse: ResponseData = {
   grade: "S",
   yellow_flags: [],
   red_flags: [],
+  key_skills: ["Software engineering", "System design", "Technical leadership"],
+  suitable_job_areas: ["Backend engineering", "Platform engineering", "Technical leadership"],
+  skills_gaps: ["Cloud certifications are not shown", "Testing expertise could be clearer", "Recent measurable outcomes could be expanded"],
+  next_steps: ["Add measurable outcomes to recent roles", "Highlight testing and quality practices", "Tailor the summary to the target role"],
 };
 
 const aResponse: ResponseData = {
@@ -31,6 +39,10 @@ const aResponse: ResponseData = {
     "Including birth date is unnecessary and can lead to bias.",
     "Including irrelevant details ('fluff') in the Mercado Libre section makes the CV less concise and direct.",
   ],
+  key_skills: ["Software development", "Cloud technologies", "Problem solving"],
+  suitable_job_areas: ["Full-stack engineering", "Cloud engineering", "Backend engineering"],
+  skills_gaps: ["Impact metrics are limited", "Testing experience is unclear", "The skills section needs stronger prioritisation"],
+  next_steps: ["Quantify achievements", "Prioritise skills for the target role", "Add evidence of testing practices"],
 };
 
 const bResponse: ResponseData = {
@@ -46,6 +58,10 @@ const bResponse: ResponseData = {
     "The experiences listed don't specify concrete achievements, metrics or results obtained in projects. Include metrics that reflect impact, like 'improved loading time by X%' or 'increased backend efficiency by Y%'.",
     "Inconsistent English usage: In the 'EXPERIENCE' section there are minor English errors like 'Particpated' instead of 'Participated'. This can affect professional impression and show lack of attention to detail.",
   ],
+  key_skills: ["Web development", "AWS", "Team collaboration"],
+  suitable_job_areas: ["Junior full-stack development", "Frontend development", "Cloud support engineering"],
+  skills_gaps: ["Achievements lack metrics", "Project detail is limited", "Written English needs proofreading"],
+  next_steps: ["Add measurable achievements", "Expand the strongest project case study", "Proofread and tailor the CV"],
 };
 
 const cResponse: ResponseData = {
@@ -57,6 +73,10 @@ const cResponse: ResponseData = {
     "Representing skills with percentages: Showing skills with percentages is discouraged as it doesn't clearly communicate actual competence level and can lead to misinterpretation. A descriptive format is preferred.",
   ],
   yellow_flags: [],
+  key_skills: ["Software development", "Digital tools", "Communication"],
+  suitable_job_areas: ["Junior software development", "Technical support", "Web content operations"],
+  skills_gaps: ["Skills lack evidence", "Achievements are not quantified", "The format is not recruiter-friendly"],
+  next_steps: ["Replace skill percentages with evidence", "Add quantified accomplishments", "Rebuild the CV in a simple one-page format"],
 };
 
 const NON_FLAGS = `
@@ -120,6 +140,8 @@ You'll also provide two arrays in the response: "red_flags" and "yellow_flags".
 "red_flags" are very bad signs and "yellow_flags" are slightly less serious.
 Each "red_flag" or "yellow_flag" must be maximum 280 characters, cannot exceed this in any way.
 
+You must also identify the candidate's strongest evidenced skills, recommend exactly three suitable job areas, identify exactly three meaningful skills gaps, and recommend exactly three practical next steps. Base every item only on evidence in the CV. A skills gap may describe missing evidence or an area to develop, but must not claim the candidate lacks a skill unless the CV supports that conclusion.
+
 ${NON_FLAGS}
 
 The response will be in this EXACT format, replacing the text inside the #, avoid any line breaks and wrap sentences in quotes like this "",
@@ -129,12 +151,17 @@ The response must be in English:
   "grade": #GRADE#,
   "red_flags": [#red_flag_1#, #red_flag_2#],
   "yellow_flags": [#yellow_flag_1#, #yellow_flag_2#],
+  "key_skills": [#skill_1#, #skill_2#, #skill_3#],
+  "suitable_job_areas": [#job_area_1#, #job_area_2#, #job_area_3#],
+  "skills_gaps": [#gap_1#, #gap_2#, #gap_3#],
+  "next_steps": [#next_step_1#, #next_step_2#, #next_step_3#]
 }
 `;
 
 export const userPrompt = `
 Please evaluate this resume and provide a grade ranging from C to A, with S for exceptionally good resumes.
 Also, offer detailed comments on how the resume can be improved.
+Identify the candidate's key skills, exactly three suitable job areas, exactly three potential skills gaps, and exactly three recommended next steps.
 
 The response should be addressed to me, so instead of talking "about the candidate", communicate directly with me to give me advice and must be in English.
 

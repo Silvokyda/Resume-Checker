@@ -82,6 +82,11 @@ export default function Home() {
     event.preventDefault();
   }
 
+  function analyseSample() {
+    setFormState({ url: "public/b_resume.pdf" });
+    router.push("/review");
+  }
+
   const mutations = useMutationState({
     filters: { mutationKey: ["resume-check"] },
     select: (mutation) => mutation.state.error,
@@ -128,6 +133,13 @@ export default function Home() {
             />
             <input className="hidden" type="text" name="name" />
           </form>
+          <button
+            type="button"
+            onClick={analyseSample}
+            className="mt-5 text-indigo-600 hover:text-indigo-700 dark:text-indigo-300 dark:hover:text-indigo-200 underline"
+          >
+            Analyse a sample CV instead
+          </button>
         </div>
       </div>
     </>

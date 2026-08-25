@@ -11,6 +11,27 @@ import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
 
+function AnalysisList({
+  title,
+  items,
+}: {
+  title: string;
+  items: string[];
+}) {
+  return (
+    <section className="mb-6">
+      <h3 className="text-xl font-semibold mb-2">{title}</h3>
+      <ul className="pl-6">
+        {items.map((item) => (
+          <li className="list-disc mb-2 last:mb-0" key={item}>
+            {item}
+          </li>
+        ))}
+      </ul>
+    </section>
+  );
+}
+
 export default function Review() {
   const router = useRouter();
   const [formState] = useFormState();
@@ -101,6 +122,23 @@ export default function Review() {
                   guide
                 </Link>
               </p>
+            ) : null}
+            {mutation.data ? (
+              <div className="mb-8">
+                <AnalysisList title="Key skills" items={mutation.data.key_skills} />
+                <AnalysisList
+                  title="Three suitable job areas"
+                  items={mutation.data.suitable_job_areas}
+                />
+                <AnalysisList
+                  title="Three potential skills gaps"
+                  items={mutation.data.skills_gaps}
+                />
+                <AnalysisList
+                  title="Three recommended next steps"
+                  items={mutation.data.next_steps}
+                />
+              </div>
             ) : null}
             {mutation.data && mutation.data?.red_flags.length > 0 ? (
               <Flags

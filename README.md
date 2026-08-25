@@ -47,6 +47,13 @@ Ensure you have the following installed:
   GOOGLE_GENERATIVE_AI_API_KEY=<your-gemini-key>
   ```
 
+  The app uses `gemini-2.5-pro` by default. You can optionally override it with
+  a currently supported Gemini model:
+
+  ```bash
+  GEMINI_MODEL=gemini-2.5-pro
+  ```
+
 1. Start the dev server
 
   ```bash

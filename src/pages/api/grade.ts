@@ -12,6 +12,8 @@ import {
   sanitizeCompletion,
 } from "@/prompts/grade";
 
+const GEMINI_MODEL = process.env.GEMINI_MODEL || "gemini-2.5-pro";
+
 export const config = {
   api: {
     bodyParser: false, // 🚨 important
@@ -74,7 +76,7 @@ export default async function handler(
     const parsed = await pdf(pdfBuffer);
 
     const completion = await generateObject({
-      model: google("gemini-1.5-pro"),
+      model: google(GEMINI_MODEL),
       temperature: 0,
       messages: messages(parsed, pdfBuffer),
       schema: ResponseSchema,
